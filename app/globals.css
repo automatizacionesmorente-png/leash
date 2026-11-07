@@ -1,26 +1,42 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  --color-paper: #f4f1ea;
+  --color-card: #fffdf8;
+  --color-line: #e3ddd0;
+  --color-ink: #15130f;
+  --color-soft: #5f5a50;
+  --color-leather: #8a4b22;
+  --color-leather-dark: #6e3a18;
+  --color-allow: #1f7a4d;
+  --color-allow-bg: #e3f1e8;
+  --color-ask: #8a5a00;
+  --color-ask-bg: #fbefd2;
+  --color-deny: #a3241a;
+  --color-deny-bg: #f8e1dd;
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-leather);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@keyframes arrive {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: none; }
+}
+.arrive { animation: arrive 0.35s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .arrive { animation: none; }
 }

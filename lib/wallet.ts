@@ -12,7 +12,7 @@ export type PurchaseRow = {
 };
 
 export type Wallet = {
-  id: string; rules_text: string; mandate: Mandate | null; vault_id: string | null; payer_email: string | null; agent_key: string;
+  id: string; rules_text: string; mandate: Mandate | null; vault_id: string | null; payer_email: string | null; agent_key: string; owner_key: string;
 };
 
 export type PurchaseRequest = { agent: string; merchant: string; category: string; amount: number; currency: string; description: string };
@@ -20,12 +20,18 @@ export type PurchaseRequest = { agent: string; merchant: string; category: strin
 export async function createWallet(): Promise<Wallet> {
   const id = randomUUID();
   const key = `lsh_${randomBytes(24).toString("base64url")}`;
-  const { rows } = await db().query("insert into wallets (id, agent_key) values ($1, $2) returning *", [id, key]);
+  const owner = randomBytes(24).toString("base64url");
+  const { rows } = await db().query("insert into wallets (id, agent_key, owner_key) values ($1, $2, $3) returning *", [id, key, owner]);
   return rows[0];
 }
 
 export async function getWallet(id: string): Promise<Wallet | null> {
   const { rows } = await db().query("select * from wallets where id = $1", [id]);
+  return rows[0] ?? null;
+}
+
+export async function walletByOwnerKey(id: string, key: string): Promise<Wallet | null> {
+  const { rows } = await db().query("select * from wallets where id = $1 and owner_key = $2", [id, key]);
   return rows[0] ?? null;
 }
 
@@ -56,13 +62,16 @@ export async function getPurchase(walletId: string, id: string): Promise<Purchas
  * Every spending decision runs inside one transaction holding the wallet's row lock, so two agents
  * buying at the same moment are decided one after the other and can never overspend a budget together.
  */
-async function locked<T>(walletId: string, fn: (q: (sql: string, params?: unknown[]) => Promise<{ rows: any[] }>, w: Wallet) => Promise<T>): Promise<T> {
+type Row = Record<string, unknown>;
+type Query = (sql: string, params?: unknown[]) => Promise<{ rows: Row[] }>;
+
+async function locked<T>(walletId: string, fn: (q: Query, w: Wallet) => Promise<T>): Promise<T> {
   const client = await db().connect();
   try {
     await client.query("begin");
     const { rows } = await client.query("select * from wallets where id = $1 for update", [walletId]);
     if (!rows[0]) throw new Error("wallet not found");
-    const out = await fn((sql, params) => client.query(sql, params as unknown[]), rows[0]);
+    const out = await fn((sql, params) => client.query(sql, params as unknown[]), rows[0] as Wallet);
     await client.query("commit");
     return out;
   } catch (e) {
@@ -73,12 +82,14 @@ async function locked<T>(walletId: string, fn: (q: (sql: string, params?: unknow
   }
 }
 
-async function paidHistory(q: (sql: string, params?: unknown[]) => Promise<{ rows: any[] }>, walletId: string): Promise<Paid[]> {
+async function paidHistory(q: Query, walletId: string): Promise<Paid[]> {
   const { rows } = await q(
     "select merchant, category, amount, currency, created_at from purchases where wallet_id = $1 and status = 'paid' and created_at > now() - interval '31 days'",
     [walletId],
   );
-  return rows.map((r) => ({ merchant: r.merchant, category: r.category, amount: r.amount, currency: r.currency, at: new Date(r.created_at) }));
+  return rows.map((r) => ({
+    merchant: String(r.merchant), category: String(r.category), amount: Number(r.amount), currency: String(r.currency), at: new Date(r.created_at as string),
+  }));
 }
 
 async function pay(w: Wallet, purchaseId: string, r: PurchaseRequest): Promise<{ status: Status; orderId?: string; error?: string }> {
@@ -124,7 +135,7 @@ export async function requestPurchase(walletId: string, r: PurchaseRequest): Pro
 export async function decide(walletId: string, purchaseId: string, approve: boolean): Promise<Answer> {
   return locked(walletId, async (q, w) => {
     const { rows } = await q("select * from purchases where wallet_id = $1 and id = $2 for update", [walletId, purchaseId]);
-    const p: PurchaseRow | undefined = rows[0];
+    const p = rows[0] as PurchaseRow | undefined;
     if (!p) throw new Error("purchase not found");
     if (p.status !== "pending") return { id: p.id, status: p.status, message: "Already decided.", reasons: [] };
     if (!approve) {

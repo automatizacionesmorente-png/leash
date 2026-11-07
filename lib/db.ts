@@ -19,7 +19,8 @@ create table if not exists wallets (
   mandate jsonb,
   vault_id text,
   payer_email text,
-  agent_key text not null unique
+  agent_key text not null unique,
+  owner_key text not null unique
 );
 create table if not exists purchases (
   id text primary key,

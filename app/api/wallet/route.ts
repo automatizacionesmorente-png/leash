@@ -4,7 +4,6 @@ import { explain, money } from "@/lib/rules/evaluate";
 import { ownerWallet } from "@/lib/session";
 import { listPurchases } from "@/lib/wallet";
 
-export const dynamic = "force-dynamic";
 
 /** Everything the owner's screen shows. Creates a fresh sandbox wallet on the first visit. */
 export async function GET() {
@@ -21,6 +20,7 @@ export async function GET() {
     summary: w.mandate ? describe(w.mandate) : [],
     paypal: w.vault_id ? { linked: true, email: w.payer_email } : { linked: false },
     agentKey: w.agent_key,
+    phonePath: `/phone?w=${w.id}&k=${w.owner_key}`,
     purchases,
   });
 }
