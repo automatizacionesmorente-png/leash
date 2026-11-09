@@ -64,6 +64,8 @@ export function toCents(value: unknown): number | null {
   return Number(whole) * 100 + Number(part.padEnd(2, "0"));
 }
 
+const REPEATED = "This exact action was already made, so it was not repeated.";
+
 /** Two invoices to the same person for the same total are the same invoice, however the items are worded. */
 export function invoiceKey(args: Record<string, unknown>): string {
   const recipients = args.primary_recipients as { billing_info?: { email_address?: string } }[] | undefined;
@@ -83,6 +85,8 @@ function refund(call: Call, c: Context): Verdict {
   // Someone else's payment is refused first, and nothing about its balance is revealed.
   if (f.wallet !== c.walletId) return { outcome: "deny", cents: f.cents, reasons: ["PayPal shows this payment belongs to another account."] };
   if (c.customer !== undefined && f.customer !== c.customer) return { outcome: "deny", cents: f.cents, reasons: ["PayPal shows this payment belongs to a different customer."] };
+
+  if (c.duplicate) return { outcome: "deny", cents, reasons: [REPEATED] };
 
   const fmt = (x: number) => money(x, f.currency);
   const deny: string[] = [];
@@ -123,8 +127,8 @@ export function decide(call: Call, c: Context): Verdict {
   if (!kind) return { outcome: "deny", cents: null, reasons: [`"${call.tool}" is not a tool Leash knows, so it is denied.`] };
   if (c.policy.blockedTools.includes(call.tool)) return { outcome: "deny", cents: null, reasons: [`The owner never allows "${call.tool}".`] };
   if (kind === "read") return { outcome: "allow", cents: null, reasons: [] };
-  if (c.duplicate) return { outcome: "deny", cents: null, reasons: ["This exact action was already made, so it was not repeated."] };
   if (kind === "refund") return refund(call, c);
+  if (c.duplicate) return { outcome: "deny", cents: null, reasons: [REPEATED] };
   if (kind === "invoice") return invoice(call, c);
   if (kind === "danger") return { outcome: "deny", cents: null, reasons: [`"${call.tool}" moves money or destroys records, so agents cannot use it.`] };
   return c.approved ? { outcome: "allow", cents: null, reasons: [] } : { outcome: "ask", cents: null, reasons: [`"${call.tool}" changes your account, so it needs your OK.`] };
