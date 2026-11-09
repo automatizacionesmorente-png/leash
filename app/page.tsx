@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Activity } from "./ui/activity";
+import { Attack } from "./ui/attack";
 import { DemoAgent } from "./ui/demo-agent";
 import { Logo } from "./ui/logo";
 import { Rules } from "./ui/rules";
@@ -53,6 +54,7 @@ export default function Home() {
         <div className="space-y-6">
           <Rules state={state} onSaved={refresh} />
           <DemoAgent ready={!!state?.mandate} linked={!!state?.paypal.linked} onDone={refresh} />
+          <Attack ready={!!state?.mandate} onDone={refresh} />
         </div>
         <div className="space-y-6">
           <section className="rounded-3xl border border-line bg-card p-6">

@@ -4,6 +4,10 @@ export type Part = { text?: string; functionCall?: { name: string; args: Record<
 export type Content = { role: "user" | "model"; parts: Part[] };
 export type FunctionDecl = { name: string; description: string; parameters: Record<string, unknown> };
 
+/** A model that just timed out is skipped for a while, so an agent with several turns does not wait on it every time. */
+const SLOW_PAUSE_MS = 5 * 60_000;
+const slowUntil = new Map<string, number>();
+
 export async function gemini(body: {
   contents: Content[];
   system?: string;
@@ -12,17 +16,25 @@ export async function gemini(body: {
 }): Promise<Part[]> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY is not set");
-  // A busy model (503) or a spent free-tier quota (429) falls through to the next one.
-  const models = [process.env.GEMINI_MODEL || "gemini-3.5-flash", "gemini-2.5-flash", "gemini-flash-lite-latest"];
+  // A slow, busy, retired or out-of-quota model falls through to the next one, so a demo never stalls on one model.
+  const models = [process.env.GEMINI_MODEL || "gemini-3.5-flash", "gemini-flash-lite-latest"];
   let last = "";
-  for (const model of [...new Set(models)]) {
-    const res = await call(model, key, body);
+  const usable = [...new Set(models)].filter((m, i, all) => i === all.length - 1 || !(slowUntil.get(m)! > Date.now()));
+  for (const model of usable) {
+    let res: Response;
+    try {
+      res = await call(model, key, body);
+    } catch (e) {
+      slowUntil.set(model, Date.now() + SLOW_PAUSE_MS);
+      last = `Gemini ${model}: ${e instanceof Error ? e.name : "failed"}`;
+      continue;
+    }
     if (res.ok) {
       const data = await res.json();
       return data.candidates?.[0]?.content?.parts ?? [];
     }
     last = `Gemini ${model} ${res.status}: ${(await res.text()).slice(0, 200)}`;
-    if (res.status !== 503 && res.status !== 429) break;
+    if (![404, 429].includes(res.status) && res.status < 500) break;
   }
   throw new Error(last);
 }
@@ -40,6 +52,6 @@ function call(model: string, key: string, body: Parameters<typeof gemini>[0]) {
         ...(body.json && { responseMimeType: "application/json", responseSchema: body.json }),
       },
     }),
-    signal: AbortSignal.timeout(25_000),
+    signal: AbortSignal.timeout(12_000),
   });
 }

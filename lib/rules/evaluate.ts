@@ -50,7 +50,7 @@ export function evaluate(p: Purchase, m: Mandate, history: Paid[], opts: { appro
 
   if (m.askAbove !== null && p.amount > m.askAbove) ask.push({ code: "above_ask", askAbove: m.askAbove });
   if (m.askForNewMerchants && !history.some((h) => norm(h.merchant) === merchant)) {
-    ask.push({ code: "new_merchant", merchant });
+    ask.push({ code: "new_merchant", merchant: p.merchant.trim() });
   }
   return ask.length ? { outcome: "ask", reasons: ask } : { outcome: "allow", reasons: [] };
 }

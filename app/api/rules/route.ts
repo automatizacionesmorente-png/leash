@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { compileRules, describe } from "@/lib/rules/compile";
 import { Mandate } from "@/lib/rules/types";
+import { TOO_MANY, modelCallAllowed } from "@/lib/rate-limit";
 import { ownerWallet } from "@/lib/session";
 import { saveRules } from "@/lib/wallet";
 
@@ -10,6 +11,7 @@ const Text = z.object({ text: z.string().trim().min(3).max(2000) });
 /** Step 1: the model turns the owner's words into a policy; code writes back what it will enforce. */
 export async function POST(req: Request) {
   const { text } = Text.parse(await req.json());
+  if (!(await modelCallAllowed(req))) return NextResponse.json({ error: TOO_MANY }, { status: 429 });
   try {
     const { mandate, unclear } = await compileRules(text);
     return NextResponse.json({ mandate, summary: describe(mandate), unclear });

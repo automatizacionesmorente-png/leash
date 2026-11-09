@@ -22,6 +22,13 @@ The model never decides whether money moves. It only translates your words; a de
 - **Approval re-checks the rules**: a purchase you approve later is evaluated again against your current rules before any charge.
 - **Idempotent charges**: every PayPal call carries a `PayPal-Request-Id` tied to the purchase, so a retry can never pay twice.
 - **Agents only hold a scoped key** (`lsh_…`), never your PayPal credentials.
+- **Public demo, capped model calls**: calls to the model are limited per visitor and overall, so nobody can drain the API quota.
+
+## Try to break it
+
+Step 4 in the app simulates an agent that has been fully taken over by a prompt injection. It sends five malicious purchases through the same path every agent uses: draining the account, disguising crypto as groceries, hiding a huge order inside a trusted shop, staying just under the approval limit, and inventing a harmless-looking shop. The code blocks them or holds them for your tap, whatever the model believed.
+
+**What Leash does not claim.** The merchant and category are what the agent says they are, so a hijacked agent can lie about them. That is why the limits do not depend on the label: a lie can only move money inside a budget you set, a shop never used before waits for you, and anything over your ask limit waits for you. The worst case is known in advance and it is the number you chose.
 
 ## Connect an agent
 

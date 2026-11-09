@@ -38,4 +38,9 @@ create table if not exists purchases (
   decided_at timestamptz
 );
 create index if not exists purchases_wallet on purchases (wallet_id, created_at desc);
+create table if not exists rate_limits (
+  bucket text primary key,
+  hits integer not null,
+  expires_at timestamptz not null
+);
 `;
