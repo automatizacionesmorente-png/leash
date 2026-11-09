@@ -44,7 +44,7 @@ function Card({ ticket, actions, disabled, reply, onRun, onChange }: { ticket: T
           ))}
         </ol>
       )}
-      {stopped >= 2 && <p className="arrive mt-3 font-serif text-2xl">The model was fooled. PayPal&apos;s records were not.</p>}
+      {poison && stopped >= 1 && <p className="arrive mt-3 font-serif text-2xl">The model was fooled. PayPal&apos;s records were not.</p>}
       {reply && <p className="mt-3 rounded-xl bg-card p-3 text-sm"><span className="font-semibold">Agent&apos;s reply: </span>{reply}</p>}
     </li>
   );

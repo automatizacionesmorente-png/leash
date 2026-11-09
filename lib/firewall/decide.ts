@@ -64,6 +64,14 @@ export function toCents(value: unknown): number | null {
   return Number(whole) * 100 + Number(part.padEnd(2, "0"));
 }
 
+/** Two invoices to the same person for the same total are the same invoice, however the items are worded. */
+export function invoiceKey(args: Record<string, unknown>): string {
+  const recipients = args.primary_recipients as { billing_info?: { email_address?: string } }[] | undefined;
+  const items = (Array.isArray(args.items) ? args.items : []) as { quantity?: unknown; unit_amount?: { value?: unknown } }[];
+  const total = items.reduce((sum, i) => sum + Math.round((toCents(i.unit_amount?.value) ?? 0) * Number(i.quantity)), 0);
+  return `${recipients?.[0]?.billing_info?.email_address?.toLowerCase() ?? ""}|${total}`;
+}
+
 function refund(call: Call, c: Context): Verdict {
   const { policy: p, facts: f } = c;
   if (!f?.found) return { outcome: "deny", cents: null, reasons: ["PayPal has no record of that payment."] };

@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
 import { walletTag } from "../lib/paypal";
-import { decide, toCents, TOOLS, type CaptureFacts, type Context, type Policy } from "../lib/firewall/decide";
+import { decide, invoiceKey, toCents, TOOLS, type CaptureFacts, type Context, type Policy } from "../lib/firewall/decide";
 
 const policy: Policy = { currency: "USD", refundAskAbove: 3000, refundMax: 20000, refundPerDay: 30000, invoiceAskAbove: 10000, invoiceMax: 50000, blockedTools: ["accept_dispute_claim"] };
 const facts = (over: Partial<Extract<CaptureFacts, { found: true }>> = {}): CaptureFacts => ({ found: true, cents: 1800, refundedCents: 0, currency: "USD", status: "COMPLETED", wallet: "w1", customer: "maya@example.com", ...over });
@@ -50,6 +50,11 @@ describe("the firewall", () => {
     const id = "6f1c7a3e-0000-4000-8000-1234567890ab";
     expect(walletTag(id)).not.toContain(id.slice(0, 8));
     expect(walletTag(id)).toBe(walletTag(id));
+  });
+  it("sees through a reworded duplicate invoice", () => {
+    const inv = (name: string, quantity: string, value: string) => ({ primary_recipients: [{ billing_info: { email_address: "raj@example.com" } }], items: [{ name, quantity, unit_amount: { value } }] });
+    expect(invoiceKey(inv("Large bowl", "2", "45.00"))).toBe(invoiceKey(inv("Two large bowls", "1", "90.00")));
+    expect(invoiceKey(inv("Large bowl", "2", "45.00"))).not.toBe(invoiceKey(inv("Large bowl", "3", "45.00")));
   });
   it("reads money without floating point", () => {
     expect(toCents("19.99")).toBe(1999);

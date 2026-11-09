@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { PayPalMCPToolkit } from "@paypal/agent-toolkit/mcp";
 import { captureFacts, PayPalError, refundCapture, token, walletTag } from "../paypal";
 import { locked, type Query, type Wallet } from "../wallet";
-import { decide, type Call, type Policy } from "./decide";
+import { decide, invoiceKey, type Call, type Policy } from "./decide";
 
 /** Dollar limits in cents. Used until the owner writes their own rules. */
 export const DEFAULT_POLICY: Policy = {
@@ -37,6 +37,10 @@ async function refundedToday(q: Query, walletId: string): Promise<number> {
 }
 
 async function isDuplicate(q: Query, walletId: string, call: Call): Promise<boolean> {
+  if (call.tool === "create_invoice") {
+    const { rows } = await q("select args from agent_actions where wallet_id = $1 and tool = 'create_invoice' and status in ('done', 'pending') and created_at > now() - interval '10 minutes'", [walletId]);
+    return rows.some((r) => invoiceKey(r.args as Record<string, unknown>) === invoiceKey(call.args));
+  }
   const { rows } = await q("select 1 from agent_actions where wallet_id = $1 and tool = $2 and args = $3::jsonb and status in ('done', 'pending') and created_at > now() - interval '10 minutes' limit 1", [walletId, call.tool, JSON.stringify(call.args)]);
   return rows.length > 0;
 }
