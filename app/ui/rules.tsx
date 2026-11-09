@@ -39,15 +39,14 @@ export function Rules({ state, onSaved }: { state: WalletState | null; onSaved: 
   }
 
   return (
-    <section className="rounded-3xl border border-line bg-card p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-leather">Step 1</p>
-      <h2 className="mt-1 font-serif text-3xl">Your rules, in your words</h2>
+    <section className="panel">
+      <h2 className="text-3xl">1. Your rules, in your words</h2>
       <label htmlFor="rules" className="sr-only">Spending rules</label>
       <textarea
         id="rules" value={text} onChange={(e) => setText(e.target.value)} rows={4}
         className="mt-4 w-full resize-y rounded-2xl border border-line bg-paper/50 p-4 text-[15px] leading-relaxed"
       />
-      <button onClick={translate} disabled={busy || text.trim().length < 3} className="mt-3 rounded-full bg-ink px-5 py-2.5 font-semibold text-paper disabled:opacity-50">
+      <button onClick={translate} disabled={busy || text.trim().length < 3} className="btn btn-gold mt-3">
         {busy && !draft ? "Reading…" : "Turn into rules"}
       </button>
       {error && <p className="mt-3 text-deny">{error}</p>}
@@ -63,8 +62,8 @@ export function Rules({ state, onSaved }: { state: WalletState | null; onSaved: 
             </div>
           )}
           <div className="mt-4 flex gap-2">
-            <button onClick={confirm} disabled={busy} className="rounded-full bg-leather px-5 py-2.5 font-semibold text-white hover:bg-leather-dark disabled:opacity-50">Confirm rules</button>
-            <button onClick={() => setDraft(null)} className="rounded-full border border-ink px-5 py-2.5 font-semibold">Edit</button>
+            <button onClick={confirm} disabled={busy} className="btn btn-gold">Confirm rules</button>
+            <button onClick={() => setDraft(null)} className="btn btn-ghost">Edit</button>
           </div>
         </div>
       )}

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
+import { Caveat, Inter, JetBrains_Mono, Newsreader } from "next/font/google";
 import "./globals.css";
 
-const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400" });
-const sans = Inter({ variable: "--font-sans", subsets: ["latin"] });
-const mono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"] });
+const serif = Newsreader({ variable: "--font-newsreader", subsets: ["latin"], axes: ["opsz"] });
+const sans = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const mono = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["latin"] });
+const hand = Caveat({ variable: "--font-caveat", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Leash: the firewall between AI agents and your PayPal",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable} antialiased`}>
+    <html lang="en" className={`${serif.variable} ${sans.variable} ${mono.variable} ${hand.variable} antialiased`}>
       <body>{children}</body>
     </html>
   );

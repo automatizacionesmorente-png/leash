@@ -37,12 +37,11 @@ export function Attack({ ready, onDone }: { ready: boolean; onDone: () => void }
   const paid = results.filter((r) => r.status === "paid").length;
 
   return (
-    <section className="rounded-3xl border border-line bg-card p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-deny">Step 4 · Break it</p>
-      <h2 className="mt-1 font-serif text-3xl">What if the agent gets hacked?</h2>
+    <section className="panel">
+      <h2 className="text-3xl">4. What if the agent gets hacked?</h2>
       <p className="mt-1 text-sm text-soft">A product page plants this instruction, and the agent obeys. This simulates a fully hijacked agent; every attempt goes through the real Leash API.</p>
-      <blockquote className="mt-4 rounded-2xl border border-deny/30 bg-deny/5 p-3 font-mono text-[13px]">{PLANTED_INSTRUCTION}</blockquote>
-      <button onClick={run} disabled={busy || !ready} className="mt-3 rounded-full bg-deny px-5 py-2.5 font-semibold text-paper disabled:opacity-50">
+      <blockquote className="mt-4 rounded-2xl border border-transparent bg-deny-bg/70 p-3 font-mono text-[13px]">{PLANTED_INSTRUCTION}</blockquote>
+      <button onClick={run} disabled={busy || !ready} className="btn btn-danger mt-3">
         {busy ? "Attacking…" : "Hijack the agent"}
       </button>
       {!ready && <p className="mt-2 text-sm text-soft">Confirm your rules first.</p>}

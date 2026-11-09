@@ -34,9 +34,8 @@ export function DemoAgent({ ready, linked, onDone }: { ready: boolean; linked: b
   }
 
   return (
-    <section className="rounded-3xl border border-line bg-card p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-leather">Step 3 · Try it</p>
-      <h2 className="mt-1 font-serif text-3xl">Send a shopping agent</h2>
+    <section className="panel">
+      <h2 className="text-3xl">3. Send a shopping agent</h2>
       <p className="mt-1 text-sm text-soft">An AI agent with a small marketplace and your PayPal, through Leash. It can only spend what your rules allow.</p>
       <div className="mt-4 flex flex-wrap gap-2">
         {TASKS.map((t) => (
@@ -47,7 +46,7 @@ export function DemoAgent({ ready, linked, onDone }: { ready: boolean; linked: b
       </div>
       <label htmlFor="task" className="sr-only">Task for the agent</label>
       <textarea id="task" value={task} onChange={(e) => setTask(e.target.value)} rows={2} className="mt-3 w-full rounded-2xl border border-line bg-paper/50 p-3" />
-      <button onClick={run} disabled={busy || !ready} className="mt-3 rounded-full bg-ink px-5 py-2.5 font-semibold text-paper disabled:opacity-50">
+      <button onClick={run} disabled={busy || !ready} className="btn btn-gold mt-3">
         {busy ? "Agent is shopping…" : "Run agent"}
       </button>
       {!ready && <p className="mt-2 text-sm text-soft">Confirm your rules first.</p>}

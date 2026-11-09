@@ -31,9 +31,8 @@ export function Setup({ state }: { state: WalletState }) {
   }
 
   return (
-    <section className="rounded-3xl border border-line bg-card p-6">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-leather">Step 2</p>
-      <h2 className="mt-1 font-serif text-3xl">Link PayPal, connect agents</h2>
+    <section className="panel">
+      <h2 className="text-3xl">2. Link PayPal, connect agents</h2>
 
       <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-line p-4">
         <div>
@@ -52,7 +51,7 @@ export function Setup({ state }: { state: WalletState }) {
       <div className="mt-4 rounded-2xl border border-line p-4">
         <p className="font-medium">Any MCP agent</p>
         <p className="text-sm text-soft">Claude, ChatGPT or your own agent gets three tools: read the rules, buy, check a purchase.</p>
-        <pre className="mt-3 overflow-x-auto rounded-xl bg-ink p-3 font-mono text-xs text-paper">{mcp}</pre>
+        <pre className="mt-3 overflow-x-auto rounded-xl bg-cream p-4 font-mono text-xs text-text">{mcp}</pre>
         <button onClick={() => copy("mcp", mcp)} className="mt-2 text-sm font-semibold text-leather underline underline-offset-4">
           {copied === "mcp" ? "Copied" : "Copy MCP config"}
         </button>

@@ -32,15 +32,15 @@ export default function Shop() {
   }, [refresh]);
 
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+    <main className="mx-auto max-w-[1200px] px-4 pb-20 sm:px-6">
       <header className="flex items-center justify-between py-6">
         <Logo />
-        <Link href="/" className="rounded-full border border-line bg-card px-3 py-1 text-xs text-soft">← Back to the firewall</Link>
+        <Link href="/" className="btn btn-ghost btn-sm">Back to the firewall</Link>
       </header>
 
       <section className="pt-6 pb-10">
-        <h1 className="max-w-3xl font-serif text-5xl leading-[1.02] tracking-tight sm:text-7xl">
-          Let AI agents shop. <span className="text-leather">On your terms.</span>
+        <h1 className="max-w-3xl text-[2.6rem] sm:text-[3.6rem]">
+          Let AI agents shop. On your terms.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-soft">
           Write your spending rules in plain words. Leash turns them into rules in code, and any agent can
@@ -58,8 +58,8 @@ export default function Shop() {
           <Attack ready={!!state?.mandate} onDone={refresh} />
         </div>
         <div className="space-y-6">
-          <section className="rounded-3xl border border-line bg-card p-6">
-            <h2 className="font-serif text-3xl">Live wallet</h2>
+          <section className="panel">
+            <h2 className="text-3xl">Live wallet</h2>
             <p className="mt-1 text-sm text-soft">Every purchase any agent tries, decided by your rules.</p>
             <div className="mt-5">{state ? <Activity items={state.purchases} onChange={refresh} /> : <p className="text-soft">Loading…</p>}</div>
           </section>

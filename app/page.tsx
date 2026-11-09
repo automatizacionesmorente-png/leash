@@ -1,18 +1,21 @@
 "use client";
 
+import { Cable, Check, Hourglass, Inbox as InboxIcon, ListChecks, ScrollText, ShieldX } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Connect, KillSwitch, Rules } from "./ui/firewall/controls";
 import { Inbox } from "./ui/firewall/inbox";
+import { Landing } from "./ui/firewall/landing";
 import { Ledger } from "./ui/firewall/ledger";
 import type { FirewallState } from "./ui/firewall/types";
 import { Logo } from "./ui/logo";
 
-const PROOFS = [
-  ["Fooled model, safe money", "Leash checks every claim against PayPal's own records, not against what the agent says."],
-  ["47 PayPal tools, one door", "The official Agent Toolkit, with money limits and approvals it does not have on its own."],
-  ["You stay in charge", "Plain-word rules, one-tap approval on your phone, and a switch that stops every agent."],
-];
+const RAIL = [
+  ["#inbox", InboxIcon, "Support inbox"],
+  ["#rules", ScrollText, "Your rules"],
+  ["#audit", ListChecks, "Audit log"],
+  ["#connect", Cable, "Connect an agent"],
+] as const;
 
 export default function Home() {
   const [state, setState] = useState<FirewallState | null>(null);
@@ -46,38 +49,38 @@ export default function Home() {
   }
 
   const open = !!state?.tickets.length;
+  if (!open || !state) return <Landing ready={!!state} starting={starting} error={error} onStart={start} />;
+
+  const count = (status: string) => state.actions.filter((a) => a.status === status).length;
+  const stats = [
+    ["sand", ListChecks, state.actions.length, "Calls recorded"],
+    ["sage", Check, count("done"), "Allowed"],
+    ["mist", Hourglass, count("pending"), "Waiting for you"],
+    ["blush", ShieldX, count("denied"), "Blocked"],
+  ] as const;
   return (
-    <main className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
-      <header className="flex items-center justify-between py-6">
-        <Logo />
-        <div className="flex items-center gap-3">
-          <Link href="/shop" className="whitespace-nowrap text-sm font-semibold text-leather underline underline-offset-4">Shopping agents</Link>
-          <span className="whitespace-nowrap rounded-full border border-line bg-card px-3 py-1 text-xs text-soft"><span className="hidden sm:inline">PayPal sandbox · no real money</span><span className="sm:hidden">Sandbox</span></span>
-        </div>
-      </header>
-
-      <section className="pt-6 pb-10">
-        <h1 className="max-w-4xl font-serif text-5xl leading-[1.02] tracking-tight sm:text-7xl">
-          Your AI agent can move your money. <span className="text-leather">One message can hijack it.</span>
-        </h1>
-        <p className="mt-5 max-w-2xl text-lg text-soft">
-          Leash is the firewall between AI agents and your PayPal. Agents refund, invoice and spend under rules you write in plain words, and every claim they make is checked against PayPal&apos;s own records.
-        </p>
-        {!open && state && (
-          <div className="mt-7">
-            <button onClick={start} disabled={starting} className="rounded-full bg-ink px-7 py-4 text-lg font-semibold text-paper disabled:opacity-60">{starting ? "Creating real sandbox orders…" : "Open the live demo shop"}</button>
-            <p className="mt-2 text-sm text-soft">No sign-up. It places three real PayPal sandbox orders for a pretend shop.</p>
-            {error && <p className="mt-2 text-deny">{error}</p>}
-          </div>
-        )}
-        {!open && (
-          <ul className="mt-10 grid gap-4 sm:grid-cols-3">
-            {PROOFS.map(([title, body]) => <li key={title} className="rounded-2xl border border-line bg-card p-5"><p className="font-semibold">{title}</p><p className="mt-1 text-sm text-soft">{body}</p></li>)}
-          </ul>
-        )}
-      </section>
-
-      {open && state && (
+    <div className="mx-auto flex max-w-[1320px] gap-6 px-4 pb-20 sm:px-6">
+      <nav aria-label="Sections" className="sticky top-6 mt-6 hidden h-fit flex-col items-center gap-2 rounded-[22px] bg-espresso p-2.5 lg:flex">
+        <span aria-hidden="true" className="grid h-11 w-11 place-items-center font-serif text-2xl font-semibold text-gold-soft">L</span>
+        {RAIL.map(([href, Icon, label]) => <a key={href} href={href} aria-label={label} title={label} className="grid h-11 w-11 place-items-center rounded-xl text-[#ede8dc] hover:bg-[#33291c]"><Icon size={20} strokeWidth={1.75} /></a>)}
+      </nav>
+      <main className="min-w-0 flex-1">
+        <header className="flex items-center justify-between py-6">
+          <span className="lg:hidden"><Logo /></span>
+          <h1 className="hidden text-[1.9rem] lg:block">Harbor Ceramics support desk</h1>
+          <span className="flex items-center gap-4 text-sm">
+            <Link href="/shop" className="hidden text-text hover:text-ink sm:inline">Shopping agents</Link>
+            <span className="text-soft">PayPal sandbox · no real money</span>
+          </span>
+        </header>
+        <ul className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {stats.map(([tint, Icon, value, label]) => (
+            <li key={label} className={`tile tile-${tint} flex items-center gap-4 !p-4 !text-left`}>
+              <span className="badge shrink-0"><Icon size={22} strokeWidth={1.75} /></span>
+              <span><span className="block font-serif text-4xl leading-none font-medium tracking-tight text-ink">{value}</span><span className="text-sm text-soft">{label}</span></span>
+            </li>
+          ))}
+        </ul>
         <div className="space-y-6">
           <div className="grid items-start gap-6 lg:grid-cols-[1.5fr_1fr]">
             <Inbox state={state} onChange={refresh} />
@@ -88,9 +91,9 @@ export default function Home() {
           </div>
           <Ledger rows={state.actions} />
           <Connect state={state} />
-          <button onClick={start} disabled={starting} className="text-sm font-semibold text-leather underline underline-offset-4">{starting ? "Resetting…" : "Reset the demo"}</button>
+          <button onClick={start} disabled={starting} className="btn btn-ghost btn-sm">{starting ? "Resetting…" : "Reset the demo"}</button>
         </div>
-      )}
-    </main>
+      </main>
+    </div>
   );
 }

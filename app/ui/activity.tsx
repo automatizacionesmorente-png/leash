@@ -46,13 +46,13 @@ export function Activity({ items, onChange, big = false }: { items: Purchase[]; 
             <div className="mt-3 flex gap-2">
               <button
                 onClick={() => decide(p.id, true)} disabled={busy === p.id}
-                className={`rounded-full bg-allow font-semibold text-white disabled:opacity-50 ${big ? "flex-1 py-4 text-lg" : "px-4 py-2"}`}
+                className={`btn btn-gold ${big ? "btn-lg flex-1" : "btn-sm"}`}
               >
                 Approve &amp; pay
               </button>
               <button
                 onClick={() => decide(p.id, false)} disabled={busy === p.id}
-                className={`rounded-full border border-ink font-semibold disabled:opacity-50 ${big ? "flex-1 py-4 text-lg" : "px-4 py-2"}`}
+                className={`btn btn-ghost ${big ? "btn-lg flex-1" : "btn-sm"}`}
               >
                 Reject
               </button>

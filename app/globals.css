@@ -1,34 +1,114 @@
 @import "tailwindcss";
 
-@theme {
-  --color-paper: #f4f1ea;
+/* Nece-sites "Marfil & Oro". Existing token names are kept so every screen shares one palette. */
+@theme inline {
+  --color-paper: #fbf6ee;
+  --color-cream: #f5efe4;
   --color-card: #fffdf8;
-  --color-line: #e3ddd0;
-  --color-ink: #15130f;
-  --color-soft: #5f5a50;
-  --color-leather: #8a4b22;
-  --color-leather-dark: #6e3a18;
-  --color-allow: #1f7a4d;
-  --color-allow-bg: #e3f1e8;
-  --color-ask: #8a5a00;
-  --color-ask-bg: #fbefd2;
-  --color-deny: #a3241a;
-  --color-deny-bg: #f8e1dd;
-  --font-serif: var(--font-serif);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --color-line: #e8e1d3;
+  --color-ink: #14110c;
+  --color-espresso: #241d14;
+  --color-text: #2e2921;
+  --color-soft: #79746c;
+  --color-leather: #8c6420;
+  --color-leather-dark: #6f4f19;
+  --color-gold: #9e711f;
+  --color-gold-soft: #d0ab73;
+  --color-olive: #3a3f2f;
+  --color-allow: #3f6b3c;
+  --color-allow-bg: #e6e4d5;
+  --color-ask: #8c6420;
+  --color-ask-bg: #f5ead7;
+  --color-deny: #a2452e;
+  --color-deny-bg: #f2e1d9;
+  --font-serif: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-hand: var(--font-caveat), cursive;
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
+  background:
+    radial-gradient(1100px 620px at 78% -8%, #f6e9d3 0%, transparent 62%),
+    var(--color-paper);
+  background-repeat: no-repeat;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: 1.6;
 }
 
+h1, h2, h3 {
+  font-family: var(--font-serif);
+  color: var(--color-ink);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+::selection { background: #f5ead7; color: var(--color-ink); }
+
 :focus-visible {
-  outline: 3px solid var(--color-leather);
-  outline-offset: 2px;
-  border-radius: 6px;
+  outline: 2px solid var(--color-gold-soft);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.panel {
+  background: var(--color-card);
+  border: 1px solid #f0eadf;
+  border-radius: 22px;
+  padding: 28px;
+  box-shadow: 0 1px 2px rgba(60, 40, 10, .04), 0 14px 34px -14px rgba(80, 55, 20, .2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55em;
+  min-height: 46px;
+  padding: 0 1.45em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: .9375rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .2s cubic-bezier(.2, .7, .2, 1), box-shadow .2s cubic-bezier(.2, .7, .2, 1), background .2s;
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:disabled { opacity: .55; cursor: default; }
+.btn-gold { background: linear-gradient(135deg, #d3a65c 0%, #b3873b 52%, #9e731f 100%); color: #fffbf3; box-shadow: 0 10px 24px -10px rgba(158, 115, 31, .55); }
+.btn-dark { background: var(--color-espresso); color: #fbf6ee; }
+.btn-dark:hover:not(:disabled) { background: #33291c; }
+.btn-ghost { background: transparent; color: var(--color-ink); border-color: var(--color-ink); }
+.btn-light { background: #fbf6ee; color: var(--color-ink); }
+.btn-danger { background: var(--color-deny); color: #fffbf3; }
+.btn-sm { min-height: 38px; font-size: .875rem; padding: 0 1.15em; }
+.btn-lg { min-height: 56px; font-size: 1rem; padding: 0 2em; }
+
+.tile { border-radius: 16px; padding: 26px 20px; text-align: center; background: var(--tile); }
+/* Secondary text on a pastel tile needs a darker tone to stay readable. */
+.tile .text-soft { color: #5f5a50; }
+.badge { width: 52px; height: 52px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--badge); color: var(--icon); }
+.tile-sage  { --tile: #e6e4d5; --badge: #cfdbbc; --icon: #4f7a3a; }
+.tile-sand  { --tile: #f5ead7; --badge: #ebd5ae; --icon: #a87b2f; }
+.tile-mist  { --tile: #e8eaec; --badge: #cdd6e3; --icon: #3e5a7e; }
+.tile-blush { --tile: #f2e1d9; --badge: #f2cdbd; --icon: #b65f45; }
+.tile-moss  { --tile: #dfddcc; --badge: #c9c9ae; --icon: #5f6638; }
+.tile-lilac { --tile: #e8e7ec; --badge: #d3d7e6; --icon: #2a496a; }
+
+.toast {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--color-card);
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: .8125rem;
+  line-height: 1.35;
+  box-shadow: 0 2px 6px rgba(60, 40, 10, .05), 0 30px 60px -24px rgba(80, 55, 20, .28);
 }
 
 @keyframes arrive {
@@ -37,6 +117,14 @@ body {
 }
 .arrive { animation: arrive 0.35s ease-out; }
 
+@keyframes drift {
+  50% { transform: translateY(-9px); }
+}
+.drift { animation: drift 6s ease-in-out infinite; }
+.drift-late { animation: drift 7s ease-in-out -2.5s infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .arrive { animation: none; }
+  .arrive, .drift, .drift-late { animation: none; }
+  .btn { transition: none; }
+  .btn:hover:not(:disabled) { transform: none; }
 }

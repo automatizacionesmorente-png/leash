@@ -8,14 +8,14 @@ import { tool, VERDICT, type Action } from "./types";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const theme = themeQuartz.withParams({
-  accentColor: "#8a4b22", backgroundColor: "#fffdf8", foregroundColor: "#15130f", borderColor: "#e3ddd0",
-  headerBackgroundColor: "#f4f1ea", headerFontWeight: 600, fontFamily: "var(--font-sans), system-ui, sans-serif", fontSize: 13, wrapperBorderRadius: 16,
+  accentColor: "#9e711f", backgroundColor: "#fffdf8", foregroundColor: "#2e2921", borderColor: "#e8e1d3",
+  headerBackgroundColor: "#f5efe4", headerFontWeight: 500, fontFamily: "var(--font-inter), system-ui, sans-serif", fontSize: 13, wrapperBorderRadius: 16,
 });
 
 function Verdict({ value }: ICellRendererParams<Action, Action["status"]>) {
   if (!value) return null;
   const v = VERDICT[value];
-  return <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${v.cls}`}>{v.label}</span>;
+  return <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${v.cls}`}>{v.label}</span>;
 }
 
 const COLUMNS: ColDef<Action>[] = [
@@ -38,15 +38,15 @@ export function Ledger({ rows }: { rows: Action[] }) {
   const defaults = useMemo<ColDef>(() => ({ sortable: true, filter: true, resizable: true, enableCellChangeFlash: true }), []);
   const blocked = rows.filter((r) => r.status === "denied").length;
   return (
-    <section className="rounded-3xl border border-line bg-card p-6">
+    <section id="audit" className="panel scroll-mt-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="font-serif text-3xl">Every move your agents make</h2>
+          <h2 className="text-3xl">Every move your agents make</h2>
           <p className="mt-1 text-sm text-soft">{rows.length} calls recorded, {blocked} stopped before reaching PayPal.</p>
         </div>
         <div className="flex items-center gap-2">
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search everything" aria-label="Search the log" className="rounded-full border border-line bg-paper px-4 py-2 text-sm" />
-          <button onClick={() => grid.current?.api.exportDataAsCsv({ fileName: "leash-audit.csv" })} className="rounded-full border border-ink px-4 py-2 text-sm font-semibold">Export audit</button>
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search everything" aria-label="Search the log" className="h-[38px] rounded-full border border-line bg-paper px-4 text-sm" />
+          <button onClick={() => grid.current?.api.exportDataAsCsv({ fileName: "leash-audit.csv" })} className="btn btn-ghost btn-sm">Export audit</button>
         </div>
       </div>
       <div className="mt-4" style={{ height: 380 }}>
