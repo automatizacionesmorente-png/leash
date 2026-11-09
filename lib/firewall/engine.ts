@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { PayPalMCPToolkit } from "@paypal/agent-toolkit/mcp";
-import { captureFacts, PayPalError, refundCapture, token } from "../paypal";
+import { captureFacts, PayPalError, refundCapture, token, walletTag } from "../paypal";
 import { locked, type Query, type Wallet } from "../wallet";
 import { decide, type Call, type Policy } from "./decide";
 
@@ -56,10 +56,11 @@ async function run(actionId: string, call: Call, cents: number | null, currency:
 
 /** The single door between an agent and PayPal. Runs under the wallet's lock, so two agents are decided one at a time. */
 export async function callTool(walletId: string, agent: string, call: Call, trusted: { customer?: string; ticketId?: string } = {}): Promise<Outcome> {
+  if (JSON.stringify(call.args).length > 20_000) return { id: "", status: "denied", reasons: ["That call is too large."] };
   return locked(walletId, async (q, w) => {
     const policy = w.firewall_policy ?? DEFAULT_POLICY;
     const id = randomUUID();
-    const verdict = decide(call, { policy, walletId, frozen: w.frozen, customer: trusted.customer, facts: await factsFor(call), refundedTodayCents: await refundedToday(q, walletId), duplicate: await isDuplicate(q, walletId, call) });
+    const verdict = decide(call, { policy, walletId: walletTag(walletId), frozen: w.frozen, customer: trusted.customer, facts: await factsFor(call), refundedTodayCents: await refundedToday(q, walletId), duplicate: await isDuplicate(q, walletId, call) });
     let status: ActionStatus = verdict.outcome === "ask" ? "pending" : "denied";
     let reasons = verdict.reasons;
     let result: unknown;
@@ -91,7 +92,7 @@ export async function answerAction(walletId: string, actionId: string, approve: 
     }
     const call = { tool: a.tool, args: a.args };
     const policy = (w as Wallet).firewall_policy ?? DEFAULT_POLICY;
-    const verdict = decide(call, { policy, walletId, frozen: w.frozen, customer: a.customer ?? undefined, facts: await factsFor(call), refundedTodayCents: await refundedToday(q, walletId), approved: true });
+    const verdict = decide(call, { policy, walletId: walletTag(walletId), frozen: w.frozen, customer: a.customer ?? undefined, facts: await factsFor(call), refundedTodayCents: await refundedToday(q, walletId), approved: true });
     if (verdict.outcome !== "allow") {
       await q("update agent_actions set status = 'denied', reasons = $2, decided_at = now() where id = $1", [a.id, JSON.stringify(verdict.reasons)]);
       return { id: a.id, status: "denied", reasons: verdict.reasons };

@@ -1,3 +1,4 @@
+import { z } from "zod";
 import { buy, rulesFor, status } from "./agent-tools";
 import { gemini, type Content, type FunctionDecl } from "./gemini";
 import type { Wallet } from "./wallet";
@@ -85,6 +86,6 @@ async function runTool(w: Wallet, name: string, args: Record<string, unknown>): 
     if (name === "purchase_status") return await status(w, String(args.id ?? ""));
     return { error: `Unknown tool ${name}` };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : "Tool failed" };
+    return { error: e instanceof z.ZodError ? "Invalid purchase." : "Tool failed" };
   }
 }

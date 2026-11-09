@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js";
 import { z } from "zod";
 import { BuyInput, buy, rulesFor, status } from "@/lib/agent-tools";
+import { TOO_MANY, agentCallAllowed } from "@/lib/rate-limit";
 import { agentWallet } from "@/lib/session";
 import type { Wallet } from "@/lib/wallet";
 
@@ -26,6 +27,7 @@ function server(w: Wallet) {
 async function handle(req: Request) {
   const w = await agentWallet(req);
   if (!w) return Response.json({ error: "Missing or wrong agent key." }, { status: 401 });
+  if (!(await agentCallAllowed(req))) return Response.json({ error: TOO_MANY }, { status: 429 });
   // Stateless: one server per request, so it runs anywhere a function does.
   const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
   await server(w).connect(transport);

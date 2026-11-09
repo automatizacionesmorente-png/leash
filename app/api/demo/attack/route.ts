@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { buy } from "@/lib/agent-tools";
 import { ATTACKS } from "@/lib/attack";
+import { TOO_MANY, agentCallAllowed } from "@/lib/rate-limit";
 import { ownerWallet } from "@/lib/session";
 
 /** Replays a hijacked agent against the owner's own wallet, through the same path every agent uses. */
-export async function POST() {
+export async function POST(req: Request) {
   const w = await ownerWallet();
   if (!w) return NextResponse.json({ error: "No wallet." }, { status: 401 });
+  if (!(await agentCallAllowed(req))) return NextResponse.json({ error: TOO_MANY }, { status: 429 });
   if (!w.mandate) return NextResponse.json({ error: "Confirm your rules first." }, { status: 409 });
   const results = [];
   for (const attack of ATTACKS) {

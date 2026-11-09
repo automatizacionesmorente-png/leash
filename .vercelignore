@@ -1,0 +1,8 @@
+.env*
+!.env.example
+.claude
+.git
+node_modules
+.next
+tests
+*.tsbuildinfo

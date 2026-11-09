@@ -1,5 +1,6 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
+import { walletTag } from "../lib/paypal";
 import { decide, toCents, TOOLS, type CaptureFacts, type Context, type Policy } from "../lib/firewall/decide";
 
 const policy: Policy = { currency: "USD", refundAskAbove: 3000, refundMax: 20000, refundPerDay: 30000, invoiceAskAbove: 10000, invoiceMax: 50000, blockedTools: ["accept_dispute_claim"] };
@@ -44,6 +45,11 @@ describe("the firewall", () => {
   it("never repeats a write that already happened, but reads are free", () => {
     expect(decide(refund("1.00"), ctx({ duplicate: true })).outcome).toBe("deny");
     expect(decide({ tool: "get_order", args: {} }, ctx({ duplicate: true })).outcome).toBe("allow");
+  });
+  it("never puts a wallet's secret id where others can read it", () => {
+    const id = "6f1c7a3e-0000-4000-8000-1234567890ab";
+    expect(walletTag(id)).not.toContain(id.slice(0, 8));
+    expect(walletTag(id)).toBe(walletTag(id));
   });
   it("reads money without floating point", () => {
     expect(toCents("19.99")).toBe(1999);

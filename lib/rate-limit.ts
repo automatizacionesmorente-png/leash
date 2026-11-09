@@ -22,4 +22,18 @@ export async function modelCallAllowed(req: Request): Promise<boolean> {
   return mine <= PER_IP.max && everyone <= OVERALL.max;
 }
 
+const ipOf = (req: Request) => req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "local";
+
+/** Agents hold a free key on a public demo, so each caller is capped too. */
+export async function agentCallAllowed(req: Request): Promise<boolean> {
+  const [mine, everyone] = await Promise.all([hits(`agent:${ipOf(req)}`, 60), hits("agent:overall", 3600)]);
+  return mine <= 60 && everyone <= 3000;
+}
+
+/** Opening the shop spends sandbox balance, so nobody can drain it and break the demo for the judges. */
+export async function demoStartAllowed(req: Request): Promise<boolean> {
+  const [mine, everyone] = await Promise.all([hits(`start:${ipOf(req)}`, 3600), hits("start:overall", 86_400)]);
+  return mine <= 6 && everyone <= 40;
+}
+
 export const TOO_MANY = "Too many requests right now. Try again in a minute.";

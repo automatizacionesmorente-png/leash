@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { startDemo } from "@/lib/firewall/demo";
-import { TOO_MANY, modelCallAllowed } from "@/lib/rate-limit";
+import { TOO_MANY, demoStartAllowed } from "@/lib/rate-limit";
 import { ownerWallet } from "@/lib/session";
 
 export const maxDuration = 60;
@@ -9,7 +9,7 @@ export const maxDuration = 60;
 export async function POST(req: Request) {
   const w = await ownerWallet(true);
   if (!w) return NextResponse.json({ error: "No wallet." }, { status: 401 });
-  if (!(await modelCallAllowed(req))) return NextResponse.json({ error: TOO_MANY }, { status: 429 });
+  if (!(await demoStartAllowed(req))) return NextResponse.json({ error: TOO_MANY }, { status: 429 });
   try {
     await startDemo(w);
     return NextResponse.json({ ok: true });

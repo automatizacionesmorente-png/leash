@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { finishLink } from "@/lib/paypal";
+import { finishLink, walletTag } from "@/lib/paypal";
 import { ownerWallet } from "@/lib/session";
 import { saveVault } from "@/lib/wallet";
 
@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const w = await ownerWallet();
   const token = url.searchParams.get("approval_token_id") ?? url.searchParams.get("token");
-  if (!w || !token || url.searchParams.get("wallet") !== w.id) {
+  if (!w || !token || url.searchParams.get("wallet") !== walletTag(w.id)) {
     return NextResponse.redirect(new URL("/?linked=failed", url.origin));
   }
   try {

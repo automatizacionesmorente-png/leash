@@ -3,7 +3,12 @@
  * (Payment Method Tokens v3, "save without purchase"); after that Leash charges the saved account with
  * the Orders v2 API, but only for purchases the rules engine allowed or the owner approved.
  */
+import { createHash } from "node:crypto";
+
 const API = process.env.PAYPAL_API_BASE || "https://api-m.sandbox.paypal.com";
+
+/** A wallet's id is its session secret, so anything stored outside Leash uses this one-way tag instead. */
+export const walletTag = (walletId: string) => createHash("sha256").update(walletId).digest("hex").slice(0, 24);
 
 let cached: { token: string; until: number } | null = null;
 
@@ -67,7 +72,7 @@ export async function startLink(walletId: string, origin: string) {
         experience_context: {
           brand_name: "Leash",
           shipping_preference: "NO_SHIPPING",
-          return_url: `${origin}/api/paypal/return?wallet=${walletId}`,
+          return_url: `${origin}/api/paypal/return?wallet=${walletTag(walletId)}`,
           cancel_url: `${origin}/?linked=cancelled`,
         },
       },

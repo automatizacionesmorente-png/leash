@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { db } from "../db";
-import { charge } from "../paypal";
+import { charge, walletTag } from "../paypal";
 import type { Wallet } from "../wallet";
 import { DEFAULT_POLICY, DEFAULT_TEXT } from "./engine";
 
@@ -18,7 +18,7 @@ export async function startDemo(w: Wallet) {
   if (!vaultId) throw new Error("no demo payer");
   const paid = await Promise.all(ORDERS.map(async (o) => ({
     ...o,
-    ...(await charge({ vaultId, purchaseId: randomUUID(), cents: o.cents, currency: "USD", merchant: SHOP, description: o.item, customId: `${w.id}|${o.email}` })),
+    ...(await charge({ vaultId, purchaseId: randomUUID(), cents: o.cents, currency: "USD", merchant: SHOP, description: o.item, customId: `${walletTag(w.id)}|${o.email}` })),
   })));
   const by = Object.fromEntries(paid.map((p) => [p.key, p]));
   const tickets = [
