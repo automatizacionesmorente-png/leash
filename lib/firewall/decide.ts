@@ -80,10 +80,12 @@ function refund(call: Call, c: Context): Verdict {
   const cents = asked === undefined ? remaining : toCents(asked);
   if (cents === null) return { outcome: "deny", cents: null, reasons: ["The refund amount is not valid."] };
 
+  // Someone else's payment is refused first, and nothing about its balance is revealed.
+  if (f.wallet !== c.walletId) return { outcome: "deny", cents: f.cents, reasons: ["PayPal shows this payment belongs to another account."] };
+  if (c.customer !== undefined && f.customer !== c.customer) return { outcome: "deny", cents: f.cents, reasons: ["PayPal shows this payment belongs to a different customer."] };
+
   const fmt = (x: number) => money(x, f.currency);
   const deny: string[] = [];
-  if (f.wallet !== c.walletId) deny.push("PayPal shows this payment belongs to another account.");
-  if (c.customer !== undefined && f.customer !== c.customer) deny.push("PayPal shows this payment belongs to a different customer.");
   if (remaining <= 0) deny.push("PayPal shows this payment is already fully refunded.");
   else if (cents > remaining) deny.push(`PayPal shows only ${fmt(remaining)} can still be refunded on this payment.`);
   if (cents <= 0) deny.push("The refund amount is not valid.");

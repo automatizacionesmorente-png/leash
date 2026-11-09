@@ -68,6 +68,7 @@ export function KillSwitch({ frozen, onChange }: { frozen: boolean; onChange: ()
 export function Connect({ state }: { state: FirewallState }) {
   const origin = useSyncExternalStore(() => () => {}, () => location.origin, () => "");
   const [qr, setQr] = useState("");
+  const [showQr, setShowQr] = useState(false);
   const [copied, setCopied] = useState(false);
   useEffect(() => {
     QRCode.toString(location.origin + state.phonePath, { type: "svg", margin: 0, color: { dark: "#15130f", light: "#0000" } }).then(setQr);
@@ -83,14 +84,16 @@ export function Connect({ state }: { state: FirewallState }) {
       <div className="min-w-0">
         <h2 className="font-serif text-3xl">Bring your own agent</h2>
         <p className="mt-1 text-sm text-soft">Claude, ChatGPT, Cursor or your own code. It gets all 47 tools of PayPal&apos;s Agent Toolkit, and every call passes through your rules first. It never holds a PayPal credential.</p>
-        <pre className="mt-3 overflow-x-auto rounded-xl bg-ink p-3 font-mono text-xs text-paper">{config}</pre>
+        <pre className="mt-3 overflow-x-auto rounded-xl bg-ink p-3 font-mono text-xs text-paper">{config.replace(state.agentKey, "lsh_••••••••••••")}</pre>
         <button onClick={copy} className="mt-2 text-sm font-semibold text-leather underline underline-offset-4">{copied ? "Copied" : "Copy MCP config"}</button>
       </div>
       <div className="flex items-center gap-4">
-        <div className="h-28 w-28 shrink-0" aria-label="QR code to open approvals on your phone" dangerouslySetInnerHTML={{ __html: qr }} />
+        {showQr
+          ? <div className="h-28 w-28 shrink-0" aria-label="QR code to open approvals on your phone" dangerouslySetInnerHTML={{ __html: qr }} />
+          : <button onClick={() => setShowQr(true)} className="h-28 w-28 shrink-0 rounded-2xl border border-dashed border-line text-sm font-semibold text-leather">Show QR code</button>}
         <div>
           <p className="font-semibold">Approve from your phone</p>
-          <p className="text-sm text-soft">Scan it. Anything waiting for you shows up with one-tap approval.</p>
+          <p className="text-sm text-soft">Anything waiting for you shows up with one-tap approval. The code signs your phone in, so keep it private.</p>
         </div>
       </div>
     </section>
