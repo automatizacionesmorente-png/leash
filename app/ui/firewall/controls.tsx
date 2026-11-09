@@ -37,8 +37,8 @@ export function Rules({ state, onChange }: { state: FirewallState; onChange: () 
   return (
     <section id="rules" className="panel scroll-mt-6">
       <h2 className="text-3xl">Your rules, in your words</h2>
-      <label className="sr-only" htmlFor="rules">Your rules</label>
-      <textarea id="rules" value={text} onChange={(e) => setText(e.target.value)} rows={5} className="mt-3 w-full rounded-2xl border border-line bg-paper p-4 text-sm leading-relaxed" />
+      <label className="sr-only" htmlFor="rules-text">Your rules</label>
+      <textarea id="rules-text" value={text} onChange={(e) => setText(e.target.value)} rows={5} className="mt-3 w-full rounded-2xl border border-line bg-paper p-4 text-sm leading-relaxed" />
       <div className="mt-2 flex gap-2">
         {draft
           ? <button onClick={confirm} className="btn btn-gold btn-sm">Enforce exactly this <ArrowRight size={15} strokeWidth={1.75} /></button>
