@@ -8,7 +8,7 @@ Leash puts one door in front of all 47 toolkit tools. Point your agent at Leash 
 
 ## Try it in one minute
 
-Open the [hosted demo](https://leash-nine.vercel.app) and press **Open the live demo shop**. There is no sign-up and no PayPal login: it places three real sandbox orders for a pretend shop. Then let the agent work through the inbox. One ticket is poisoned.
+Open the [hosted demo](https://leash-nine.vercel.app) and press **Open the live demo**. There is no sign-up and no PayPal login: it places three real sandbox orders for a pretend shop. Then let the agent work through the inbox. One ticket is poisoned.
 
 ## What happens in the demo
 
