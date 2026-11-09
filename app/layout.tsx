@@ -7,8 +7,8 @@ const sans = Inter({ variable: "--font-sans", subsets: ["latin"] });
 const mono = JetBrains_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Leash: spending rules for AI agents",
-  description: "Let AI agents pay with PayPal, only within the rules you set in plain words.",
+  title: "Leash: the firewall between AI agents and your PayPal",
+  description: "AI agents refund, invoice and spend on your PayPal only within rules you write in plain words, checked against PayPal's own records.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

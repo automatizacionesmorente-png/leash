@@ -2,6 +2,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { db } from "./db";
 import { charge, PayPalError } from "./paypal";
 import { evaluate, explain } from "./rules/evaluate";
+import type { Policy as FirewallPolicy } from "./firewall/decide";
 import { Mandate, type Paid, type Reason } from "./rules/types";
 
 export type Status = "paid" | "pending" | "denied" | "rejected" | "failed";
@@ -13,6 +14,7 @@ export type PurchaseRow = {
 
 export type Wallet = {
   id: string; rules_text: string; mandate: Mandate | null; vault_id: string | null; payer_email: string | null; agent_key: string; owner_key: string;
+  firewall_policy: FirewallPolicy | null; firewall_text: string; frozen: boolean;
 };
 
 export type PurchaseRequest = { agent: string; merchant: string; category: string; amount: number; currency: string; description: string };
@@ -63,9 +65,9 @@ export async function getPurchase(walletId: string, id: string): Promise<Purchas
  * buying at the same moment are decided one after the other and can never overspend a budget together.
  */
 type Row = Record<string, unknown>;
-type Query = (sql: string, params?: unknown[]) => Promise<{ rows: Row[] }>;
+export type Query = (sql: string, params?: unknown[]) => Promise<{ rows: Row[] }>;
 
-async function locked<T>(walletId: string, fn: (q: Query, w: Wallet) => Promise<T>): Promise<T> {
+export async function locked<T>(walletId: string, fn: (q: Query, w: Wallet) => Promise<T>): Promise<T> {
   const client = await db().connect();
   try {
     await client.query("begin");
@@ -107,6 +109,7 @@ export type Answer = { id: string; status: Status; message: string; reasons: str
 /** What an agent calls to spend. The rules decide; the agent only gets the verdict and why. */
 export async function requestPurchase(walletId: string, r: PurchaseRequest): Promise<Answer> {
   return locked(walletId, async (q, w) => {
+    if (w.frozen) return { id: "", status: "denied" as Status, message: "The owner cut the leash: every agent is stopped.", reasons: [] };
     if (!w.mandate) return { id: "", status: "denied" as Status, message: "The owner has not set any spending rules yet.", reasons: [] };
     const id = randomUUID();
     const decision = evaluate({ ...r, at: new Date() }, w.mandate, await paidHistory(q, walletId));
