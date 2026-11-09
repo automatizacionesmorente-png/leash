@@ -30,7 +30,7 @@ export async function GET() {
     tickets: tickets.rows.map((t) => ({ id: t.id, customer: t.customer_name, email: t.customer_email, subject: t.subject, body: t.body, status: t.status })),
     actions: (actions.rows as Row[]).map((a) => ({
       id: a.id, at: a.created_at, agent: a.agent, tool: a.tool, target: target(a), customer: a.customer, ticketId: a.ticket_id,
-      amount: a.cents === null ? "" : money(a.cents, a.currency), status: a.status, reasons: a.reasons, paypalRef: a.paypal_ref,
+      amount: a.cents === null ? "" : money(a.cents, a.currency), status: a.status, reasons: a.reasons, paypalRef: a.paypal_ref, confirmed: !!a.paypal_confirmed_at,
     })),
   });
 }

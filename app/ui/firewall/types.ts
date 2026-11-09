@@ -1,6 +1,6 @@
 export type Action = {
   id: string; at: string; agent: string; tool: string; target: string; customer: string | null; ticketId: string | null;
-  amount: string; status: "done" | "pending" | "denied" | "rejected" | "failed"; reasons: string[]; paypalRef: string | null;
+  amount: string; status: "done" | "pending" | "denied" | "rejected" | "failed"; reasons: string[]; paypalRef: string | null; confirmed: boolean;
 };
 export type Ticket = { id: string; customer: string; email: string; subject: string; body: string; status: string };
 export type FirewallState = { text: string; lines: string[]; frozen: boolean; agentKey: string; phonePath: string; tickets: Ticket[]; actions: Action[] };

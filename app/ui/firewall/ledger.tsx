@@ -28,6 +28,7 @@ const COLUMNS: ColDef<Action>[] = [
   { field: "agent", headerName: "Agent", width: 130 },
   { field: "target", headerName: "Target", width: 190, cellClass: "font-mono" },
   { field: "paypalRef", headerName: "PayPal ID", width: 190, cellClass: "font-mono" },
+  { field: "confirmed", headerName: "PayPal confirmed", width: 150, valueFormatter: (p) => (p.value ? "✓ By webhook" : "") },
 ];
 
 /** Every call any agent made, whether or not it ever reached PayPal. */

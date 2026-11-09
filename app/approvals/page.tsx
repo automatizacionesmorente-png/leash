@@ -28,7 +28,7 @@ export default function Approvals() {
     <main className="mx-auto max-w-md px-4 py-6">
       <Logo />
       <h1 className="mt-6 font-serif text-4xl leading-tight">{!state ? "Approvals" : waiting ? `${waiting} waiting for you` : "All clear"}</h1>
-      <p className="mt-1 text-soft">What your agents tried to buy, decided by your rules.</p>
+      <p className="mt-1 text-soft">What your agents tried to do, decided by your rules.</p>
       <ul className="mt-6 space-y-3">
         {actions.map((a) => (
           <li key={a.id} className="arrive rounded-2xl border border-ask bg-ask-bg/40 p-4">
@@ -44,7 +44,7 @@ export default function Approvals() {
           </li>
         ))}
       </ul>
-      <div className="mt-6">{state ? <Activity items={state.purchases} onChange={refresh} big /> : <p className="text-soft">Loading…</p>}</div>
+      <div className="mt-6">{!state ? <p className="text-soft">Loading…</p> : (state.purchases.length > 0 || !actions.length) && <Activity items={state.purchases} onChange={refresh} big />}</div>
     </main>
   );
 }

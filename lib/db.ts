@@ -71,6 +71,7 @@ create table if not exists agent_actions (
   paypal_ref text,
   decided_at timestamptz
 );
+alter table agent_actions add column if not exists paypal_confirmed_at timestamptz;
 create index if not exists agent_actions_wallet on agent_actions (wallet_id, created_at desc);
 create table if not exists rate_limits (
   bucket text primary key,

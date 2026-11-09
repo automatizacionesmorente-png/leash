@@ -140,3 +140,14 @@ export async function refundCapture(p: { captureId: string; cents: number; curre
     note_to_payer: "Refund issued through Leash",
   }, p.actionId);
 }
+
+/** Asks PayPal whether a webhook really came from PayPal. Without a configured webhook id nothing is believed. */
+export async function webhookIsGenuine(headers: Headers, event: unknown): Promise<boolean> {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  if (!webhookId) return false;
+  const get = (name: string) => headers.get(`paypal-${name}`);
+  const fields = { auth_algo: get("auth-algo"), cert_url: get("cert-url"), transmission_id: get("transmission-id"), transmission_sig: get("transmission-sig"), transmission_time: get("transmission-time") };
+  if (Object.values(fields).some((v) => !v)) return false;
+  const check = await call<{ verification_status: string }>("/v1/notifications/verify-webhook-signature", { ...fields, webhook_id: webhookId, webhook_event: event }).catch(() => null);
+  return check?.verification_status === "SUCCESS";
+}

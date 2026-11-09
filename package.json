@@ -37,5 +37,14 @@
     "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "@paypal/agent-toolkit": {
+      "zod": "$zod",
+      "ai": "^6.0.0",
+      "@langchain/core": "^1.1.30",
+      "openai": "^6.0.0",
+      "mathjs": "^15.2.0"
+    }
   }
 }

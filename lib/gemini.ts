@@ -34,6 +34,7 @@ export async function gemini(body: {
       return data.candidates?.[0]?.content?.parts ?? [];
     }
     last = `Gemini ${model} ${res.status}: ${(await res.text()).slice(0, 200)}`;
+    if (res.status === 429) slowUntil.set(model, Date.now() + 60_000);
     if (![404, 429].includes(res.status) && res.status < 500) break;
   }
   throw new Error(last);

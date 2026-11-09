@@ -51,8 +51,8 @@ export default function Home() {
       <header className="flex items-center justify-between py-6">
         <Logo />
         <div className="flex items-center gap-3">
-          <Link href="/shop" className="text-sm font-semibold text-leather underline underline-offset-4">Shopping agents</Link>
-          <span className="rounded-full border border-line bg-card px-3 py-1 text-xs text-soft">PayPal sandbox · no real money</span>
+          <Link href="/shop" className="whitespace-nowrap text-sm font-semibold text-leather underline underline-offset-4">Shopping agents</Link>
+          <span className="whitespace-nowrap rounded-full border border-line bg-card px-3 py-1 text-xs text-soft"><span className="hidden sm:inline">PayPal sandbox · no real money</span><span className="sm:hidden">Sandbox</span></span>
         </div>
       </header>
 

@@ -66,6 +66,8 @@ npm run dev
 npm test
 ```
 
+`package.json` overrides replace dependencies of the Agent Toolkit that Leash never loads, so `npm audit --omit=dev` is clean.
+
 `DEMO_VAULT_ID` is a sandbox payer's vault token: link a sandbox buyer once on `/shop` to get one.
 
 ## License

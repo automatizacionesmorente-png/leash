@@ -15,7 +15,7 @@ function Card({ ticket, actions, disabled, reply, onRun, onChange }: { ticket: T
   const [head, poison] = ticket.body.split("\n---\n");
   return (
     <li className="arrive rounded-2xl border border-line bg-paper/60 p-4">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
         <div className="min-w-0">
           <p className="font-semibold">{ticket.subject}</p>
           <p className="text-sm text-soft">{ticket.customer} · {ticket.email}</p>
@@ -33,7 +33,7 @@ function Card({ ticket, actions, disabled, reply, onRun, onChange }: { ticket: T
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${VERDICT[a.status].cls}`}>{VERDICT[a.status].label}</span>
               </div>
               {a.reasons.length > 0 && <p className="text-soft">{a.reasons.join(" ")}</p>}
-              {a.paypalRef && <p className="font-mono text-xs text-soft">PayPal {a.paypalRef}</p>}
+              {a.paypalRef && <p className="font-mono text-xs text-soft">PayPal {a.paypalRef}{a.confirmed ? " · ✓ confirmed by PayPal" : ""}</p>}
               {a.status === "pending" && (
                 <div className="mt-2 flex gap-2">
                   <button onClick={() => decide(a.id, true)} disabled={busy === a.id} className="rounded-full bg-allow px-4 py-1.5 text-sm font-semibold text-white disabled:opacity-50">Approve</button>
