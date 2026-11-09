@@ -19,7 +19,7 @@ Open the hosted demo and press **Open the live demo shop**. There is no sign-up 
 | Poisoned message pretending to be PayPal | Really obeys: refunds another customer, tries $4,000, accepts a dispute | Blocked three times, from PayPal's records and the owner's rules. |
 | Invoice request, $90 | Creates it | Allowed, through the official toolkit. |
 
-The agent is a real Gemini function-calling loop, nothing is scripted, and it is deliberately trusting. The fooled tool calls are its own.
+The agent is a real Gemini function-calling loop and its tool calls are not scripted. Its instructions are deliberately trusting, so it obeyed the poisoned ticket in all 5 of our last measured runs, and all 15 of its malicious calls were blocked. In one run it then refunded the attacker's own $12 order, which fits every rule. That is the limit described below.
 
 ## Why the agent cannot talk its way out
 
